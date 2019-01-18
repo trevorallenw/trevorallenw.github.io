@@ -1,0 +1,129 @@
+@charset "UTF-8";
+/* CSS Document */
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: #fff;
+	font-family: 'Times', medium, black;
+}
+
+h1 {
+	color: #3C3C3C;
+}
+
+#nav h1 {
+	color: #fff;
+}
+
+#nav {
+	background-color: #006699;
+	border-bottom: 2px solid #cccccc;
+	padding: 15px;
+	margin-bottom: 20px;
+	box-shadow: 3px 2px 10px 3px #996699;
+}
+
+.mainInfo {
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	padding-top: 20px;
+}
+
+.aboutMe {
+	width: 50%;
+	float: left;
+	word-wrap: normal;
+}
+
+.mainInfo img {
+	float: right;
+	width: 40%;
+	margin-left: 5%;
+	margin-bottom: 5%;
+	max-width: 440px;
+}
+
+#mainTable {
+	clear: left;
+	width: 95%;
+}
+
+table p {
+	font-size: small;
+}
+
+.tableImgs {
+	width: 70%;
+	margin-left: 15%;
+	margin-right: 15%;
+	margin-bottom: 20px;
+}
+
+.tableCell {
+	
+}
+
+td {
+	width: 50%;
+	color: #3C3C3C;
+	vertical-align: top;
+	padding: 3px;
+}
+
+#courseTable {
+	border: 2px solid black;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 15px;
+}
+
+#courseTable tr:nth-child(even) {
+	background-color: #cccccc;
+	
+}
+
+#courseTable tr:nth-child(odd) {
+	background-color: #006699;
+}
+
+#courseTable tr:nth-child(odd) {
+	background-color: #006699;
+}
+
+#courseTable td:nth-child(1), td:nth-child(3) {
+	text-align: center;
+}
+
+#courseTable tr:hover {
+	background-color: #996699;
+	
+}
+
+#courseTable th {
+	background-color: #fff;
+	
+}
+
+#courseTable {
+	text-align: left;
+}
+
+#test {
+	margin-top: 35px;
+	width: 100%;
+	clear: both;
+}
+
+.links a {
+	margin: 5px;
+}
+
+.best {
+	font-style: italic;
+}
+
