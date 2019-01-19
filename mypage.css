@@ -15,32 +15,13 @@ h1 {
 	color: #3C3C3C;
 }
 
-#nav h1 {
-	color: #fff;
-}
-
-#nav {
-	background-color: #006699;
-	border-bottom: 2px solid #cccccc;
-	padding: 15px;
-	margin-bottom: 20px;
-	box-shadow: 3px 2px 10px 3px #996699;
-}
-
-.mainInfo {
-	width: 98%;
-	margin-left: 1%;
-	margin-right: 1%;
-	padding-top: 20px;
-}
-
 .aboutMe {
 	width: 50%;
 	float: left;
 	word-wrap: normal;
 }
 
-.mainInfo img {
+img {
 	float: right;
 	width: 40%;
 	margin-left: 5%;
@@ -80,15 +61,25 @@ td {
 	border-radius: 5px;
 	padding: 10px;
 	margin: 15px;
+	text-align: left;
+}
+
+#courseTable tr {
+	border: 2px solid black;
+}
+
+#courseTable th {
+	background-color: #fff;
+	border: 2px solid black;
+}
+
+#courseTable td {
+	border: 2px solid black;
 }
 
 #courseTable tr:nth-child(even) {
 	background-color: #cccccc;
 	
-}
-
-#courseTable tr:nth-child(odd) {
-	background-color: #006699;
 }
 
 #courseTable tr:nth-child(odd) {
@@ -102,15 +93,6 @@ td {
 #courseTable tr:hover {
 	background-color: #996699;
 	
-}
-
-#courseTable th {
-	background-color: #fff;
-	
-}
-
-#courseTable {
-	text-align: left;
 }
 
 #test {
