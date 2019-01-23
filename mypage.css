@@ -50,7 +50,6 @@ table p {
 td {
 	width: 50%;
 	color: #3C3C3C;
-	vertical-align: top;
 	padding: 3px;
 }
 
@@ -91,6 +90,10 @@ td {
 #courseTable tr:hover {
 	background-color: #996699;
 	
+}
+
+#things {
+	list-style-type: lower-alpha;
 }
 
 #test {
