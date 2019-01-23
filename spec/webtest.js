@@ -1,7 +1,7 @@
 var MyCSSRules;
 
 describe('Web Page Homework', () => {
-  const MY_HTML_FILE = 'completed.html';
+  const MY_HTML_FILE = 'myfile.html';
   var mTable;
   var page, pageStr;
   var cssURL;
