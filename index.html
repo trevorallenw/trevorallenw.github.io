@@ -1,0 +1,319 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Homework 7 - Firebase</title>
+    <meta name="description" content="Homework 7 - Firebase">
+    <meta name="author" content="Trevor West">
+
+    <link rel="stylesheet" href="index.css">
+
+</head>
+
+<body>
+    Select json file to upload:<br/>
+    <input type="file" name="fileToUpload" id="fileToUpload"><br/>
+    <button id="fileSubmit" onclick="processUpload()">Upload File</button><br/>
+
+    <input type="text" class="txt search" placeholder="Search..." id="searchTerms" onchange="search()"/>
+
+    <p>Search Results:</p>
+    <table class="data-table" id="searchResultsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Age</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="searchContent">
+
+        </tbody>
+    </table>
+
+    <p id="err">&nbsp;</p>
+
+    <table class="data-table" id="friendsTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Age</th>
+                <th>Action</th>
+            </tr>
+        </thead>    
+        <tbody>
+            <tr>
+                <td><input type="text" class="txt" id="newName" placeholder="Name"/></td>
+                <td><input type="text" class="txt" id="newPhone" placeholder="(555) 555-5555"/></td>
+                <td><input type="number" class="txt" id="newAge" placeholder="Age" min="0" max="99"/></td>
+                <td><input type="button" class="btn" onclick="addEntry()" value="add"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br/>
+    <td><input type="button" class="btn" onclick="deleteRecords()" value="delete all records"/></td>
+
+    <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+        apiKey: "AIzaSyC5AapN882CV2aOXfBI0bVgXbWtNHmuvDs",
+        authDomain: "homework7-e5ccc.firebaseapp.com",
+        databaseURL: "https://homework7-e5ccc.firebaseio.com",
+        projectId: "homework7-e5ccc",
+        storageBucket: "homework7-e5ccc.appspot.com",
+        messagingSenderId: "134775477942"
+        };
+        
+        firebase.initializeApp(config);
+
+        // Get elements
+        const file = document.getElementById("fileToUpload");
+        const upload = document.getElementById("fileSubmit");
+
+
+        var rootRef = firebase.database().ref(); // ref() points to root node without arguement
+        friendRef = rootRef.child("friend");
+
+        // push() creates a new node with a unique key (empty value)
+        // set() overwrites a new content into an existing node (replaces ALL nodes)
+        // update() is set() but only affects nodes with matching keys
+        
+        //friendRef.push().set({name:"Tom", age:26});
+
+        var table = document.getElementById("friendsTable");
+        var searchResultsTable = document.getElementById("searchResultsTable");
+        var rowNum = 1;
+        var rNum = 1;
+
+        // child added listener
+        friendRef.on("child_added", snapshot => {
+            var friend = snapshot.val();
+            console.log(friend.name);
+
+            // dynamically add results to table
+            var row = table.insertRow(rowNum+1);
+
+            var key = snapshot.ref.key;
+            row.id = key;
+
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+
+            cell1.innerHTML = friend.name;
+            cell2.innerHTML = formatPhoneNumber(friend.phone);
+            cell3.innerHTML = friend.age;
+            cell4.innerHTML = `<input type="button" class="btn" onclick="deleteOne('${key}')" value="delete"/>`;
+
+            rowNum++;
+        });
+
+
+        friendRef.on("child_removed", snapshot => {
+            let friend = snapshot.val();
+            console.log("attempt to remove: " + friend.name);
+
+            var key = snapshot.key;
+
+            // 'tr[id=-LPmeB1IeM2WKAqp4eez]'
+            const whichParent = table.querySelector('#friendsTable tbody');
+            console.log("removed: " + whichParent);
+
+            var rowToRemove = whichParent.querySelector(`tr[id=${key}]`);
+            whichParent.removeChild(rowToRemove);
+            
+            // remove from search results too FIX ME, may be null
+            const whichParent2 = searchResultsTable.querySelector('#searchResultsTable tbody');
+            var rowToRemove2 = whichParent2.querySelector(`tr[id=${key}]`);
+            
+            if (rowToRemove2 != null) {
+                whichParent2.removeChild(rowToRemove2);
+            }
+
+            var content = document.querySelectorAll("#searchContent tr");
+            var parent = document.getElementById("searchContent");
+            
+            for (let k=0; k<content.length; k++) {
+                parent.removeChild(content[k]);
+            }
+
+        });
+
+        function deleteOne(key) {
+            friendRef.child(key).set(null);
+            rowNum -= 1;
+        }
+
+        function escapeRegExp(string) {
+            return string.replace('\b[A-Z][a-z]*( [A-Z][a-z]*)*\b'); // $& means the whole matched string
+        }
+
+        function addEntry() {
+            // clear errors
+            document.getElementById("err").innerHTML = "";
+
+            const newName = document.getElementById("newName").value;
+            const newPhone = document.getElementById("newPhone").value;
+            const newAge = document.getElementById("newAge").value;
+
+            var regName = new RegExp(/\b[a-z]/);
+
+            //console.log("regex test: " + escapeRegExp(newPhone));
+
+            // validate input using regular expressions
+            if (!regName.test(newName)) {
+                if (newName.length < 1) {
+                    //console.log("invalid name");
+                    document.getElementById("err").innerHTML = "Please enter a name.";
+                    return false;
+                }
+            } else {
+                //console.log("every word not capitalized in " + newName);
+                document.getElementById("err").innerHTML = "Names must have proper capitalization.";
+                return false;
+            }
+
+            var regNum = new RegExp('^\\d+$');
+
+            if (regNum.test(newPhone)) {
+                if (newPhone.length != 7 && newPhone.length != 10) {
+                    //console.log("invalid phone: " + newPhone);
+                    //console.log(parseInt(newPhone, 10));
+                    document.getElementById("err").innerHTML = "Invalid phone number. Must be 7 or 10 digits long.";
+                    return false; 
+                }
+            } else {
+                //console.log("invalid phone, not an integer: " + newPhone);
+                document.getElementById("err").innerHTML = "Please enter a phone number.";
+                return false;
+            }
+
+            if (regNum.test(newAge)) {
+                if (parseInt(newAge, 10) < 0 || parseInt(newAge, 10) > 99) {
+                    document.getElementById("err").innerHTML = "Invalid age. Must be between 0 and 99.";
+                    //console.log("invalid age: " + newAge);
+                    return false; 
+                }
+            } else {
+                //console.log("invalid age, not an integer: " + newAge);
+                document.getElementById("err").innerHTML = "Invalid age.";
+                return false;
+            }
+
+
+            var jsonStr = '{ "name": "' + newName + '", "phone": "' + formatPhoneNumber(newPhone) + '", "age": ' + newAge + ' }';
+            var jsonObj = JSON.parse(jsonStr);
+            friendRef.push().set(jsonObj);
+
+            // clear input
+            document.getElementById("newName").value = "";
+            document.getElementById("newPhone").value = "";
+            document.getElementById("newAge").value = "";
+        }
+
+
+        function formatPhoneNumber(phoneNumberString) {
+            var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+
+            if (phoneNumberString.length == 10) {
+                var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/)
+                if (match) {
+                    return '(' + match[1] + ') ' + match[2] + '-' + match[3]
+                }
+            }
+
+            if (phoneNumberString.length == 7) {
+                var match = cleaned.match(/^(\d{3})(\d{4})$/)
+                if (match) {
+                    return '' + match[1] + '-' + match[2]
+                }
+            }
+
+            return phoneNumberString;
+        }
+
+
+        function deleteRecords() {
+            friendRef.set(null);
+            rowNum = 1;
+            alert("All records deleted.");
+        }
+
+
+        function processUpload() {
+            var i = 0;
+            if ('files' in file) {
+                var reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    var jsonObj = JSON.parse(event.target.result);
+                    /* put your code here, whatever you need to do with jsonObj */
+
+                    var len = Object.keys(jsonObj).length;
+
+                    while (i < len) {
+                        friendRef.push().set(jsonObj[i]);
+                        i++;
+                    }
+                    
+                };
+
+                /* file is an array and we are interested only in the first element */
+                reader.readAsText(file.files[0]);
+
+            }
+
+            alert('uploaded');
+        }
+        
+
+        // combine child_added listener on orderByChild (in if statement use contains)
+        function search() {
+            // remove all current results
+            var content = document.querySelectorAll("#searchContent tr");
+            var parent = document.getElementById("searchContent");
+            var tableRef = document.getElementById('searchResultsTable').getElementsByTagName('tbody')[0];
+            
+            for (let k=0; k<content.length; k++) {
+                parent.removeChild(content[k]);
+            }
+
+            var nameSearch = friendRef.orderByChild('name').on('value', function(snapshot) {
+                    
+                    // generate the resulting table
+                    friendRef.on("child_added", snapshot => {
+                        var friend = snapshot.val();
+
+                        if (friend.name.toUpperCase().includes(document.getElementById("searchTerms").value.toUpperCase()) && document.getElementById("searchTerms").value != "") {
+                            // dynamically add results to table
+                            var row = tableRef.insertRow(tableRef.rows.length);
+
+                            var key = snapshot.ref.key;
+                            row.id = key;
+
+                            var cell1 = row.insertCell(0);
+                            var cell2 = row.insertCell(1);
+                            var cell3 = row.insertCell(2);
+                            var cell4 = row.insertCell(3);
+
+                            cell1.innerHTML = friend.name;
+                            cell2.innerHTML = formatPhoneNumber(friend.phone);
+                            cell3.innerHTML = friend.age;
+                            cell4.innerHTML = `<input type="button" class="btn" onclick="deleteOne('${key}')" value="delete"/>`;
+
+                            rNum++;
+                        } 
+                    });
+                });
+        }
+
+    </script>
+</body>
+</html>

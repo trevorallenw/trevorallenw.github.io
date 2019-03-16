@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300');
+
+* {
+    font-family: 'Open Sans Condensed', sans-serif;
+}
+
+.data-table {
+    border: 2px solid black;
+
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.data-table tr {
+    padding: 5px;
+}
+
+.data-table tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.data-table th {
+    background-color: #14a3db;
+}
+
+.data-table th, td {
+    padding: 5px;
+}
+
+.data-table tr:hover {
+    background-color: #fff999;
+}
+
+.btn {
+    border: none;
+    border-radius: 15px;
+    background-color: #14a3db;
+    font-weight: bold;
+    padding: 3px 15px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.txt {
+    font-weight: bold;
+    padding: 3px 15px;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.search {
+    border: 2px solid #14a3db;
+    margin-left: 5px;
+    margin-top: 5px;
+}
