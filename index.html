@@ -1,319 +1,152 @@
-<!doctype html>
+<html>
+  <head>
+    <title>VueJS Tutorial</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+      .slider {
+        width: 30%; /* Full-width */
+        height: 25px; /* Specified height */
+        display: block;
+        margin: 15px;
+      }
 
-<html lang="en">
-<head>
-    <meta charset="utf-8">
+      #fetchresult {
+        font-family: "Lucida Console", Monaco, monospace;
+        font-size: 14px;
+      }
 
-    <title>Homework 7 - Firebase</title>
-    <meta name="description" content="Homework 7 - Firebase">
-    <meta name="author" content="Trevor West">
+      table,
+      td,
+      th {
+        border: 1px solid #ddd;
+        text-align: left;
+        margin-top: 15px;
+      }
 
-    <link rel="stylesheet" href="index.css">
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
 
-</head>
+      th,
+      td {
+        padding: 5px;
+      }
 
-<body>
-    Select json file to upload:<br/>
-    <input type="file" name="fileToUpload" id="fileToUpload"><br/>
-    <button id="fileSubmit" onclick="processUpload()">Upload File</button><br/>
+      img {
+        margin: 5px;
+      }
 
-    <input type="text" class="txt search" placeholder="Search..." id="searchTerms" onchange="search()"/>
+      button {
+        margin: 5px 15px;
+        padding: 8px;
+        background-color: aquamarine;
+      }
 
-    <p>Search Results:</p>
-    <table class="data-table" id="searchResultsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Age</th>
-                <th>Action</th>
+      .zoomed {
+        position: fixed;
+        right: 15;
+        top: 15;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- replace the actual text of the following h2 with a text that shows your name -->
+    <h2>VueJS Experiment by Trevor West</h2>
+
+    <div id="top">
+      <div id="control">
+        <label for="inputrange" v-if="userCount == 1">
+          Will fetch {{ userCount }} random user
+        </label>
+        <label for="inputrange" v-else="userCount > 1">
+          Will fetch {{ userCount }} random users
+        </label>
+        <input
+          type="range"
+          id="inputrange"
+          min="1"
+          max="50"
+          v-model:value="userCount"
+          class="slider"
+        />
+
+        <input type="checkbox" id="AU" value="AU" v-model="nationalities" />
+        <label for="AU">AU</label>
+        <input type="checkbox" id="BR" value="BR" v-model="nationalities" />
+        <label for="BR">BR</label>
+        <input type="checkbox" id="CA" value="CA" v-model="nationalities" />
+        <label for="CA">CA</label>
+        <input type="checkbox" id="CH" value="CH" v-model="nationalities" />
+        <label for="CH">CH</label>
+        <input type="checkbox" id="DE" value="DE" v-model="nationalities" />
+        <label for="DE">DE</label>
+        <input type="checkbox" id="DK" value="DK" v-model="nationalities" />
+        <label for="DK">DK</label>
+        <input type="checkbox" id="ES" value="ES" v-model="nationalities" />
+        <label for="ES">ES</label>
+        <input type="checkbox" id="FI" value="FI" v-model="nationalities" />
+        <label for="FI">FI</label>
+        <input type="checkbox" id="FR" value="FR" v-model="nationalities" />
+        <label for="FR">FR</label>
+        <input type="checkbox" id="GB" value="GB" v-model="nationalities" />
+        <label for="GB">GB</label>
+        <input type="checkbox" id="IE" value="IE" v-model="nationalities" />
+        <label for="IE">IE</label>
+        <input type="checkbox" id="IR" value="IR" v-model="nationalities" />
+        <label for="IR">IR</label>
+        <input type="checkbox" id="NO" value="NO" v-model="nationalities" />
+        <label for="NO">NO</label>
+        <input type="checkbox" id="NL" value="NL" v-model="nationalities" />
+        <label for="NL">NL</label>
+        <input type="checkbox" id="NZ" value="NZ" v-model="nationalities" />
+        <label for="NZ">NZ</label>
+        <input type="checkbox" id="TR" value="TR" v-model="nationalities" />
+        <label for="TR">TR</label>
+        <input type="checkbox" id="US" value="US" v-model="nationalities" />
+        <label for="US">US</label>
+        <br />
+        <!-- <span>Checked names: {{ nationalities }}</span> -->
+      </div>
+      <button v-on:click="getUser">Fetch</button>
+      <button v-on:click="resetUser">Reset</button>
+
+      <!-- bind img to src in mouseover event handler function -->
+      <img v-bind:src="currentHighRes" class="zoomed" />
+      <div id="fetchresult">
+        <!-- For debugging only: <br />{{ users }} -->
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Phone</th>
+            <th>DOB</th>
+            <th>Image</th>
+            <th>Flag</th>
+          </tr>
+          <template v-for="u in users">
+            <tr @mouseover="setHighRes(u)" @mouseleave="resetHighRes(u)">
+              <td>{{ u.name.first }} {{ u.name.last }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.login.username }}</td>
+              <td>{{ u.phone }}</td>
+              <td>{{ u.dob.date.substring(0, 10) }}</td>
+              <td>
+                <img v-bind:src="`${u.picture.thumbnail}`" />
+              </td>
+              <td>
+                <img
+                  v-bind:src="`https://www.countryflags.io/${u.nat}/shiny/64.png`"
+                />
+              </td>
             </tr>
-        </thead>
-        <tbody id="searchContent">
+          </template>
+        </table>
+      </div>
+    </div>
 
-        </tbody>
-    </table>
-
-    <p id="err">&nbsp;</p>
-
-    <table class="data-table" id="friendsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Age</th>
-                <th>Action</th>
-            </tr>
-        </thead>    
-        <tbody>
-            <tr>
-                <td><input type="text" class="txt" id="newName" placeholder="Name"/></td>
-                <td><input type="text" class="txt" id="newPhone" placeholder="(555) 555-5555"/></td>
-                <td><input type="number" class="txt" id="newAge" placeholder="Age" min="0" max="99"/></td>
-                <td><input type="button" class="btn" onclick="addEntry()" value="add"/></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br/>
-    <td><input type="button" class="btn" onclick="deleteRecords()" value="delete all records"/></td>
-
-    <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
-    <script>
-        // Initialize Firebase
-        var config = {
-        apiKey: "AIzaSyC5AapN882CV2aOXfBI0bVgXbWtNHmuvDs",
-        authDomain: "homework7-e5ccc.firebaseapp.com",
-        databaseURL: "https://homework7-e5ccc.firebaseio.com",
-        projectId: "homework7-e5ccc",
-        storageBucket: "homework7-e5ccc.appspot.com",
-        messagingSenderId: "134775477942"
-        };
-        
-        firebase.initializeApp(config);
-
-        // Get elements
-        const file = document.getElementById("fileToUpload");
-        const upload = document.getElementById("fileSubmit");
-
-
-        var rootRef = firebase.database().ref(); // ref() points to root node without arguement
-        friendRef = rootRef.child("friend");
-
-        // push() creates a new node with a unique key (empty value)
-        // set() overwrites a new content into an existing node (replaces ALL nodes)
-        // update() is set() but only affects nodes with matching keys
-        
-        //friendRef.push().set({name:"Tom", age:26});
-
-        var table = document.getElementById("friendsTable");
-        var searchResultsTable = document.getElementById("searchResultsTable");
-        var rowNum = 1;
-        var rNum = 1;
-
-        // child added listener
-        friendRef.on("child_added", snapshot => {
-            var friend = snapshot.val();
-            console.log(friend.name);
-
-            // dynamically add results to table
-            var row = table.insertRow(rowNum+1);
-
-            var key = snapshot.ref.key;
-            row.id = key;
-
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            var cell4 = row.insertCell(3);
-
-            cell1.innerHTML = friend.name;
-            cell2.innerHTML = formatPhoneNumber(friend.phone);
-            cell3.innerHTML = friend.age;
-            cell4.innerHTML = `<input type="button" class="btn" onclick="deleteOne('${key}')" value="delete"/>`;
-
-            rowNum++;
-        });
-
-
-        friendRef.on("child_removed", snapshot => {
-            let friend = snapshot.val();
-            console.log("attempt to remove: " + friend.name);
-
-            var key = snapshot.key;
-
-            // 'tr[id=-LPmeB1IeM2WKAqp4eez]'
-            const whichParent = table.querySelector('#friendsTable tbody');
-            console.log("removed: " + whichParent);
-
-            var rowToRemove = whichParent.querySelector(`tr[id=${key}]`);
-            whichParent.removeChild(rowToRemove);
-            
-            // remove from search results too FIX ME, may be null
-            const whichParent2 = searchResultsTable.querySelector('#searchResultsTable tbody');
-            var rowToRemove2 = whichParent2.querySelector(`tr[id=${key}]`);
-            
-            if (rowToRemove2 != null) {
-                whichParent2.removeChild(rowToRemove2);
-            }
-
-            var content = document.querySelectorAll("#searchContent tr");
-            var parent = document.getElementById("searchContent");
-            
-            for (let k=0; k<content.length; k++) {
-                parent.removeChild(content[k]);
-            }
-
-        });
-
-        function deleteOne(key) {
-            friendRef.child(key).set(null);
-            rowNum -= 1;
-        }
-
-        function escapeRegExp(string) {
-            return string.replace('\b[A-Z][a-z]*( [A-Z][a-z]*)*\b'); // $& means the whole matched string
-        }
-
-        function addEntry() {
-            // clear errors
-            document.getElementById("err").innerHTML = "";
-
-            const newName = document.getElementById("newName").value;
-            const newPhone = document.getElementById("newPhone").value;
-            const newAge = document.getElementById("newAge").value;
-
-            var regName = new RegExp(/\b[a-z]/);
-
-            //console.log("regex test: " + escapeRegExp(newPhone));
-
-            // validate input using regular expressions
-            if (!regName.test(newName)) {
-                if (newName.length < 1) {
-                    //console.log("invalid name");
-                    document.getElementById("err").innerHTML = "Please enter a name.";
-                    return false;
-                }
-            } else {
-                //console.log("every word not capitalized in " + newName);
-                document.getElementById("err").innerHTML = "Names must have proper capitalization.";
-                return false;
-            }
-
-            var regNum = new RegExp('^\\d+$');
-
-            if (regNum.test(newPhone)) {
-                if (newPhone.length != 7 && newPhone.length != 10) {
-                    //console.log("invalid phone: " + newPhone);
-                    //console.log(parseInt(newPhone, 10));
-                    document.getElementById("err").innerHTML = "Invalid phone number. Must be 7 or 10 digits long.";
-                    return false; 
-                }
-            } else {
-                //console.log("invalid phone, not an integer: " + newPhone);
-                document.getElementById("err").innerHTML = "Please enter a phone number.";
-                return false;
-            }
-
-            if (regNum.test(newAge)) {
-                if (parseInt(newAge, 10) < 0 || parseInt(newAge, 10) > 99) {
-                    document.getElementById("err").innerHTML = "Invalid age. Must be between 0 and 99.";
-                    //console.log("invalid age: " + newAge);
-                    return false; 
-                }
-            } else {
-                //console.log("invalid age, not an integer: " + newAge);
-                document.getElementById("err").innerHTML = "Invalid age.";
-                return false;
-            }
-
-
-            var jsonStr = '{ "name": "' + newName + '", "phone": "' + formatPhoneNumber(newPhone) + '", "age": ' + newAge + ' }';
-            var jsonObj = JSON.parse(jsonStr);
-            friendRef.push().set(jsonObj);
-
-            // clear input
-            document.getElementById("newName").value = "";
-            document.getElementById("newPhone").value = "";
-            document.getElementById("newAge").value = "";
-        }
-
-
-        function formatPhoneNumber(phoneNumberString) {
-            var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
-
-            if (phoneNumberString.length == 10) {
-                var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/)
-                if (match) {
-                    return '(' + match[1] + ') ' + match[2] + '-' + match[3]
-                }
-            }
-
-            if (phoneNumberString.length == 7) {
-                var match = cleaned.match(/^(\d{3})(\d{4})$/)
-                if (match) {
-                    return '' + match[1] + '-' + match[2]
-                }
-            }
-
-            return phoneNumberString;
-        }
-
-
-        function deleteRecords() {
-            friendRef.set(null);
-            rowNum = 1;
-            alert("All records deleted.");
-        }
-
-
-        function processUpload() {
-            var i = 0;
-            if ('files' in file) {
-                var reader = new FileReader();
-                
-                reader.onload = function(event) {
-                    var jsonObj = JSON.parse(event.target.result);
-                    /* put your code here, whatever you need to do with jsonObj */
-
-                    var len = Object.keys(jsonObj).length;
-
-                    while (i < len) {
-                        friendRef.push().set(jsonObj[i]);
-                        i++;
-                    }
-                    
-                };
-
-                /* file is an array and we are interested only in the first element */
-                reader.readAsText(file.files[0]);
-
-            }
-
-            alert('uploaded');
-        }
-        
-
-        // combine child_added listener on orderByChild (in if statement use contains)
-        function search() {
-            // remove all current results
-            var content = document.querySelectorAll("#searchContent tr");
-            var parent = document.getElementById("searchContent");
-            var tableRef = document.getElementById('searchResultsTable').getElementsByTagName('tbody')[0];
-            
-            for (let k=0; k<content.length; k++) {
-                parent.removeChild(content[k]);
-            }
-
-            var nameSearch = friendRef.orderByChild('name').on('value', function(snapshot) {
-                    
-                    // generate the resulting table
-                    friendRef.on("child_added", snapshot => {
-                        var friend = snapshot.val();
-
-                        if (friend.name.toUpperCase().includes(document.getElementById("searchTerms").value.toUpperCase()) && document.getElementById("searchTerms").value != "") {
-                            // dynamically add results to table
-                            var row = tableRef.insertRow(tableRef.rows.length);
-
-                            var key = snapshot.ref.key;
-                            row.id = key;
-
-                            var cell1 = row.insertCell(0);
-                            var cell2 = row.insertCell(1);
-                            var cell3 = row.insertCell(2);
-                            var cell4 = row.insertCell(3);
-
-                            cell1.innerHTML = friend.name;
-                            cell2.innerHTML = formatPhoneNumber(friend.phone);
-                            cell3.innerHTML = friend.age;
-                            cell4.innerHTML = `<input type="button" class="btn" onclick="deleteOne('${key}')" value="delete"/>`;
-
-                            rNum++;
-                        } 
-                    });
-                });
-        }
-
-    </script>
-</body>
+    <script src="firstvue.js"></script>
+    <script src="vue.js"></script>
+  </body>
 </html>
